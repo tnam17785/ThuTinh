@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gửi TMy thân yêu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Itim&family=Be+Vietnam+Pro:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night-1: #1b1436;
+    --night-2: #2c1f4a;
+    --night-3: #4a2f5e;
+    --cream: #fbf1e0;
+    --cream-2: #f6e6cd;
+    --gold: #e0ac5f;
+    --gold-deep: #b9793a;
+    --rose: #e3a1a8;
+    --rose-deep: #c46b78;
+    --ink: #4a3a4f;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%; width:100%;
+    overflow:hidden;
+    font-family:'Be Vietnam Pro', sans-serif;
+    background: radial-gradient(ellipse at 50% 20%, var(--night-3) 0%, var(--night-2) 45%, var(--night-1) 100%);
+  }
+  .sky{
+    position:fixed; inset:0; overflow:hidden;
+  }
+  .star{
+    position:absolute; border-radius:50%;
+    background: var(--cream);
+    animation: twinkle 3.5s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:.25; transform:scale(1);}
+    50%{opacity:1; transform:scale(1.3);}
+  }
+  .moon{
+    position:absolute; top:8%; right:10%;
+    width:70px; height:70px; border-radius:50%;
+    background: radial-gradient(circle at 35% 35%, #fff6df, var(--gold) 70%, var(--gold-deep) 100%);
+    box-shadow: 0 0 40px 10px rgba(224,172,95,.35);
+    animation: floaty 6s ease-in-out infinite;
+  }
+  @keyframes floaty{
+    0%,100%{ transform:translateY(0px);}
+    50%{ transform:translateY(-10px);}
+  }
+  .petal{
+    position:absolute; top:-5%;
+    width:10px; height:10px; border-radius:50% 0 50% 50%;
+    background: var(--rose);
+    opacity:.7;
+    animation: fall linear infinite;
+  }
+  @keyframes fall{
+    0%{ transform: translateY(0) rotate(0deg); opacity:0;}
+    10%{opacity:.7;}
+    100%{ transform: translateY(110vh) rotate(360deg); opacity:0;}
+  }
+
+  .stage{
+    position:relative; z-index:2;
+    height:100%; width:100%;
+    display:flex; align-items:center; justify-content:center;
+    perspective:1600px;
+  }
+
+  /* ---------- Envelope ---------- */
+  .envelope-wrap{
+    position:relative;
+    width:min(320px, 78vw);
+    aspect-ratio: 3 / 2;
+    cursor:pointer;
+    transition: transform .8s cubic-bezier(.6,.05,.3,1), opacity .8s ease;
+  }
+  .envelope-wrap.hidden{
+    transform: scale(.4) translateY(40px);
+    opacity:0;
+    pointer-events:none;
+  }
+  .env-shadow{
+    position:absolute; left:50%; bottom:-18px; width:80%; height:22px;
+    background: radial-gradient(ellipse, rgba(0,0,0,.45), transparent 70%);
+    transform: translateX(-50%);
+  }
+  .env-body{
+    position:absolute; inset:0;
+    background: linear-gradient(160deg, var(--cream) 0%, var(--cream-2) 100%);
+    border-radius:6px;
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,.55);
+  }
+  .env-body::before, .env-body::after{
+    content:""; position:absolute; bottom:0; width:0; height:0;
+    border-style:solid;
+  }
+  .env-body::before{
+    left:0; border-width: 0 0 100% 50%;
+    border-color: transparent transparent rgba(0,0,0,.05) transparent;
+  }
+  .env-body::after{
+    right:0; border-width: 0 50% 100% 0;
+    border-color: transparent transparent rgba(0,0,0,.05) transparent;
+  }
+  .letter{
+    position:absolute; left:6%; right:6%; top:8%;
+    height:84%;
+    background: var(--cream);
+    border-radius:3px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    transform: translateY(0%);
+    transition: transform 1s cubic-bezier(.5,-0.2,.25,1.15) .35s;
+    z-index:2;
+    display:flex; align-items:flex-start; justify-content:center; padding-top:14%;
+  }
+  .letter-text{
+    font-family:'Itim', cursive; font-size:13px; color:var(--ink);
+    opacity:.55; letter-spacing:.5px;
+  }
+  .open .letter{
+    transform: translateY(-92%);
+  }
+  .flap-top{
+    position:absolute; top:0; left:0; width:100%; height:52%;
+    background: linear-gradient(160deg, var(--cream-2), var(--cream));
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transform: rotateX(0deg);
+    transition: transform .7s cubic-bezier(.6,.05,.3,1);
+    z-index:3;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  }
+  .open .flap-top{
+    transform: rotateX(180deg);
+    z-index:1;
+  }
+  .seal{
+    position:absolute; top:46%; left:50%;
+    width:46px; height:46px; border-radius:50%;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle at 35% 30%, #f0c98a, var(--gold) 55%, var(--gold-deep) 100%);
+    box-shadow: 0 3px 8px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.15);
+    display:flex; align-items:center; justify-content:center;
+    z-index:4;
+    transition: transform .5s ease, opacity .5s ease;
+  }
+  .seal svg{ width:20px; height:20px; }
+  .open .seal{
+    transform: translate(-50%,-50%) scale(0);
+    opacity:0;
+  }
+  .hint{
+    position:absolute; bottom:-46px; left:50%; transform:translateX(-50%);
+    color: var(--cream-2); font-family:'Itim', cursive; font-size:15px;
+    white-space:nowrap; opacity:.8;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:.5;}
+    50%{opacity:1;}
+  }
+
+  /* ---------- Reveal message ---------- */
+  .reveal{
+    position:absolute; z-index:5; text-align:center;
+    padding: 40px 34px;
+    max-width: 520px; width:88vw;
+    opacity:0; transform: scale(.85) translateY(16px);
+    transition: opacity .9s ease .3s, transform .9s cubic-bezier(.3,1,.4,1) .3s;
+    pointer-events:none;
+  }
+  .reveal.show{
+    opacity:1; transform: scale(1) translateY(0);
+    pointer-events:auto;
+  }
+  .reveal-frame{
+    border: 1px solid rgba(224,172,95,.55);
+    padding: 36px 28px;
+    border-radius:4px;
+    position:relative;
+  }
+  .reveal-frame::before, .reveal-frame::after{
+    content:""; position:absolute; width:22px; height:22px;
+    border: 1px solid var(--gold);
+  }
+  .reveal-frame::before{ top:-8px; left:-8px; border-width:1px 0 0 1px; }
+  .reveal-frame::after{ bottom:-8px; right:-8px; border-width:0 1px 1px 0; }
+  .eyebrow{
+    font-family:'Itim', cursive; color: var(--rose); font-size:15px;
+    letter-spacing:2px; margin:0 0 6px;
+  }
+  .headline{
+    font-family:'Playfair Display', serif; font-style:italic; font-weight:700;
+    font-size: clamp(34px, 8vw, 56px);
+    color: var(--cream);
+    margin:0 0 14px;
+    text-shadow: 0 0 26px rgba(224,172,95,.35);
+  }
+  .sub{
+    font-family:'Be Vietnam Pro', sans-serif; font-weight:300;
+    color: var(--rose); font-size:15px; line-height:1.7;
+    margin:0; letter-spacing:.3px;
+  }
+  .flourish{
+    width:70px; height:14px; margin:18px auto; opacity:.8;
+  }
+  .again{
+    margin-top:26px; background:none; border:1px solid rgba(224,172,95,.55);
+    color: var(--cream-2); font-family:'Be Vietnam Pro', sans-serif; font-size:13px;
+    padding:9px 20px; border-radius:20px; cursor:pointer; letter-spacing:.5px;
+    transition: background .3s ease, transform .2s ease;
+  }
+  .again:hover{ background: rgba(224,172,95,.15); transform: translateY(-1px); }
+
+  @media (max-width:420px){
+    .reveal-frame{ padding:28px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sky" id="sky"></div>
+
+<div class="stage">
+  <div class="envelope-wrap" id="envelopeWrap">
+    <div class="env-shadow"></div>
+    <div class="env-body">
+      <div class="letter"><div class="letter-text">✦ ✦ ✦</div></div>
+      <div class="flap-top"></div>
+      <div class="seal">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2.2 4.5 5.6 4c2-.3 3.7.7 6.4 3 2.7-2.3 4.4-3.3 6.4-3 3.4.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z" fill="#fff" opacity="0.9"/>
+        </svg>
+      </div>
+    </div>
+    <div class="hint">chạm vào thư để mở nhé…</div>
+  </div>
+
+  <div class="reveal" id="reveal">
+    <div class="reveal-frame">
+      <p class="eyebrow">Gửi đến TMy</p>
+      <h1 class="headline">Chào<br>buổi tối</h1>
+      <svg class="flourish" viewBox="0 0 70 14" fill="none">
+        <path d="M0 7 Q17 -3 35 7 T70 7" stroke="#e0ac5f" stroke-width="1"/>
+      </svg>
+      <p class="sub">Mong một buổi tối nhẹ nhàng và bình yên<br>sẽ đến với cậu, như ánh trăng ngoài kia.</p>
+      <button class="again" id="againBtn">Mở lại thư</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const sky = document.getElementById('sky');
+  const starCount = 70;
+  for(let i=0;i<starCount;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random()*2.2+1;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*70+'%';
+    s.style.animationDelay = (Math.random()*3.5)+'s';
+    s.style.animationDuration = (2.5+Math.random()*3)+'s';
+    sky.appendChild(s);
+  }
+  const moon = document.createElement('div');
+  moon.className = 'moon';
+  sky.appendChild(moon);
+
+  const petalCount = 14;
+  for(let i=0;i<petalCount;i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random()*100+'%';
+    p.style.animationDuration = (7+Math.random()*8)+'s';
+    p.style.animationDelay = (Math.random()*10)+'s';
+    p.style.background = Math.random()>0.5 ? '#e3a1a8' : '#e0ac5f';
+    sky.appendChild(p);
+  }
+
+  const envelopeWrap = document.getElementById('envelopeWrap');
+  const reveal = document.getElementById('reveal');
+  const againBtn = document.getElementById('againBtn');
+
+  envelopeWrap.addEventListener('click', () => {
+    if(envelopeWrap.classList.contains('open')) return;
+    envelopeWrap.classList.add('open');
+    setTimeout(() => {
+      envelopeWrap.classList.add('hidden');
+      reveal.classList.add('show');
+    }, 950);
+  });
+
+  againBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    reveal.classList.remove('show');
+    setTimeout(() => {
+      envelopeWrap.classList.remove('open');
+      envelopeWrap.classList.remove('hidden');
+    }, 500);
+  });
+</script>
+
+</body>
+</html>
